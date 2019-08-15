@@ -81,17 +81,18 @@ class _ISPConfigClient(object):
     def _api_request(self, action, data):
         if self.session_id is not None:
             data['session_id'] = self.session_id
+        url = self._get_url(action)
         resp = self.session.get(
-            self._get_url(action),
+            url,
             json=data
         )
+        logger.debug('API REquest to URL: %s', url)
         if resp.status_code != 200:
             raise errors.PluginError('HTTP Error during login {0}'.format(resp.status_code))
         try:
             result = resp.json()
         except:
             raise errors.PluginError('API response with non JSON: {0}'.format(resp.text))
-        logger.debug(result.text)
         if (result['code'] == 'ok'):
             return result['response']
         elif (result['code'] == 'remote_fault'):
@@ -120,7 +121,7 @@ class _ISPConfigClient(object):
         zone_id, zone_name = self._find_managed_zone_id(domain)
         if zone_id is None:
             raise errors.PluginError("Domain not known")
-        logger.debug('domain found: %s with id: %d', zone_name, zone_id)
+        logger.debug('domain found: %s with id: %s', zone_name, zone_id)
         o_record_name = record_name
         record_name = record_name.replace(zone_name, '')[:-1]
         logger.debug('using record_name: %s from original: %s', record_name, o_record_name)
@@ -150,14 +151,14 @@ class _ISPConfigClient(object):
         zone_id, zone_name = self._find_managed_zone_id(domain)
         if zone_id is None:
             raise errors.PluginError("Domain not known")
-        logger.debug('domain found: %s with id: %d', zone_name, zone_id)
+        logger.debug('domain found: %s with id: %s', zone_name, zone_id)
         o_record_name = record_name
         record_name = record_name.replace(zone_name, '')[:-1]
         logger.debug('using record_name: %s from original: %s', record_name, o_record_name)
         record = self.get_existing_txt(zone_id, record_name)
         if record is not None:
             if record['data'] == record_content:
-                logger.debug('delete TXT record: %d', record['id'])
+                logger.debug('delete TXT record: %s', record['id'])
                 self._delete_txt_record(record['id'])
 
     def _prepare_rr_data(self, zone_id, record_name, record_content, record_ttl):

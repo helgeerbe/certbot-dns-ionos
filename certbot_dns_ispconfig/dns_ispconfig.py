@@ -125,7 +125,7 @@ class _ISPConfigClient(object):
         o_record_name = record_name
         record_name = record_name.replace(zone_name, '')[:-1]
         logger.debug('using record_name: %s from original: %s', record_name, o_record_name)
-        record = self.get_existing_txt(zone_id, record_name)
+        record = self.get_existing_txt(zone_id, record_name, record_content)
         if record is not None:
             if record['data'] == record_content:
                 logger.info('already there, id {0}'.format(record['id']))
@@ -155,7 +155,7 @@ class _ISPConfigClient(object):
         o_record_name = record_name
         record_name = record_name.replace(zone_name, '')[:-1]
         logger.debug('using record_name: %s from original: %s', record_name, o_record_name)
-        record = self.get_existing_txt(zone_id, record_name)
+        record = self.get_existing_txt(zone_id, record_name, record_content)
         if record is not None:
             if record['data'] == record_content:
                 logger.debug('delete TXT record: %s', record['id'])
@@ -217,7 +217,7 @@ class _ISPConfigClient(object):
                 pass
         return None
 
-    def get_existing_txt(self, zone_id, record_name):
+    def get_existing_txt(self, zone_id, record_name, record_content):
         """
         Get existing TXT records from the RRset for the record name.
 
@@ -235,6 +235,6 @@ class _ISPConfigClient(object):
         read_zone_data = {'zone_id': zone_id}
         zone_data = self._api_request('dns_rr_get_all_by_zone', read_zone_data)
         for entry in zone_data:
-            if entry['name'] == record_name and entry['type'] == 'TXT':
+            if entry['name'] == record_name and entry['type'] == 'TXT' and entry['data'] == record_content:
                 return entry
         return None

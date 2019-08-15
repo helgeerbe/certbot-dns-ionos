@@ -122,7 +122,7 @@ class _ISPConfigClient(object):
             raise errors.PluginError("Domain not known")
         logger.debug('domain found: %s with id: %d', zone_name, zone_id)
         o_record_name = record_name
-        record_name = record_name.replace(zone_name, '')
+        record_name = record_name.replace(zone_name, '')[:-1]
         logger.debug('using record_name: %s from original: %s', record_name, o_record_name)
         record = self.get_existing_txt(zone_id, record_name)
         if record is not None:
@@ -152,7 +152,7 @@ class _ISPConfigClient(object):
             raise errors.PluginError("Domain not known")
         logger.debug('domain found: %s with id: %d', zone_name, zone_id)
         o_record_name = record_name
-        record_name = record_name.replace(zone_name, '')
+        record_name = record_name.replace(zone_name, '')[:-1]
         logger.debug('using record_name: %s from original: %s', record_name, o_record_name)
         record = self.get_existing_txt(zone_id, record_name)
         if record is not None:

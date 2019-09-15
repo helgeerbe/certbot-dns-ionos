@@ -87,12 +87,14 @@ To acquire a single certificate for both ``example.com`` and
 
 .. code-block:: bash
 
-   certbot certonly \\
-     --authenticator certbot-dns-netcup:dns-netcup \\
-     --certbot-dns-netcup:dns-netcup-credentials ~/.secrets/certbot/netcup.ini \\
-     --certbot-dns-netcup:dns-netcup-propagation-seconds 900 \\
+   certbot certonly \
+     --authenticator certbot-dns-ispconfig:dns-ispconfig \
+     --certbot-dns-ispconfig:dns-ispconfig-credentials /etc/letsencrypt/.secrets/domain.tld.ini \
+     --certbot-dns-ispconfig:dns-ispconfig-propagation-seconds 900 \
      --server https://acme-v02.api.letsencrypt.org/directory \
-     -d 'example.com' \\
+     --agree-tos \
+     --rsa-key-size 4096 \
+     -d 'example.com' \
      -d '*.example.com'
 
 
@@ -121,12 +123,12 @@ Once that's finished, the application can be run as follows::
        --authenticator certbot-dns-ispconfig:dns-ispconfig \
        --certbot-dns-ispconfig:dns-ispconfig-propagation-seconds 900 \
        --certbot-dns-ispconfig:dns-ispconfig-credentials \
-           /var/lib/letsencrypt/ispconfig_credentials.ini \
+           /etc/letsencrypt/.secrets/domain.tld.ini \
        --no-self-upgrade \
        --keep-until-expiring --non-interactive --expand \
        --server https://acme-v02.api.letsencrypt.org/directory \
        -d example.com -d '*.example.com'
 
-You may want to change the volumes ``/var/lib/letsencrypt`` and
-``/etc/letsencrypt`` to local directories where the certificates and
-configuration should be stored.
+It is suggested to secure the folder as follows::
+chown root:root /etc/letsencrypt/.secrets
+chmod 600 /etc/letsencrypt/.secrets

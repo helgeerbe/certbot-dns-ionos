@@ -1,6 +1,7 @@
 """DNS Authenticator for ISPConfig."""
 import json
 import logging
+import time
 
 import requests
 import zope.interface
@@ -133,7 +134,7 @@ class _ISPConfigClient(object):
         :raises certbot.errors.PluginError: if an error occurs communicating with the ISPConfig API
         """
         self._login()
-        zone_id, zone_name = self._find_managed_zone_id(domain)
+        zone_id, zone_name = self._find_managed_zone_id(domain, record_name)
         if zone_id is None:
             raise errors.PluginError("Domain not known")
         logger.debug("domain found: %s with id: %s", zone_name, zone_id)
@@ -167,7 +168,7 @@ class _ISPConfigClient(object):
         :raises certbot.errors.PluginError: if an error occurs communicating with the ISPConfig API
         """
         self._login()
-        zone_id, zone_name = self._find_managed_zone_id(domain)
+        zone_id, zone_name = self._find_managed_zone_id(domain, record_name)
         if zone_id is None:
             raise errors.PluginError("Domain not known")
         logger.debug("domain found: %s with id: %s", zone_name, zone_id)
@@ -196,6 +197,7 @@ class _ISPConfigClient(object):
                 "zone": zone_id,
                 "ttl": record_ttl,
                 "update_serial": False,
+                "stamp": time.strftime('%Y-%m-%d %H:%M:%S'),
             },
         }
         return data
@@ -218,7 +220,7 @@ class _ISPConfigClient(object):
         logger.debug("delete with data: %s", data)
         result = self._api_request("dns_txt_delete", data)
 
-    def _find_managed_zone_id(self, domain):
+    def _find_managed_zone_id(self, domain, record_name):
         """
         Find the managed zone for a given domain.
 
@@ -228,7 +230,7 @@ class _ISPConfigClient(object):
         :raises certbot.errors.PluginError: if the managed zone cannot be found.
         """
 
-        zone_dns_name_guesses = dns_common.base_domain_name_guesses(domain)
+        zone_dns_name_guesses = [record_name] + dns_common.base_domain_name_guesses(domain)
 
         for zone_name in zone_dns_name_guesses:
             # get the zone id

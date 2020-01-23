@@ -34,7 +34,7 @@ To start using DNS authentication for ispconfig, pass the following arguments on
 certbot's command line:
 
 ============================================================= ==============================================
-``--authenticator certbot-dns-ispconfig:dns-netcup``          select the authenticator plugin (Required)
+``--authenticator certbot-dns-ispconfig:dns-ispconfig``          select the authenticator plugin (Required)
 
 ``--certbot-dns-ispconfig:dns-ispconfig-credentials``         ispconfig Remote User credentials
                                                               INI file. (Required)
@@ -57,7 +57,7 @@ An example ``credentials.ini`` file:
 
    certbot_dns_ispconfig:dns_ispconfig_username = myremoteuser
    certbot_dns_ispconfig:dns_ispconfig_password = verysecureremoteuserpassword
-   certbot_dns_ispconfig:dns_ispconfig_endpoint = https://localhost:8080
+   certbot_dns_ispconfig:dns_ispconfig_endpoint = https://localhost:8080/remote/json.php
 
 The path to this file can be provided interactively or using the
 ``--certbot-dns-ispconfig:dns-ispconfig-credentials`` command-line argument. Certbot

@@ -13,8 +13,8 @@ from certbot.plugins import dns_test_common
 from certbot.plugins.dns_test_common import DOMAIN
 from certbot.tests import util as test_util
 
-FAKE_USER = "remoteuser"
-FAKE_PW = "password"
+FAKE_PREFIX = "prefix"
+FAKE_SECRET = "secret"
 FAKE_ENDPOINT = "mock://endpoint"
 
 
@@ -29,8 +29,8 @@ class AuthenticatorTest(
         path = os.path.join(self.tempdir, "file.ini")
         dns_test_common.write(
             {
-                "ispconfig_username": FAKE_USER,
-                "ispconfig_password": FAKE_PW,
+                "ispconfig_prefix": FAKE_PREFIX,
+                "ispconfig_secret": FAKE_SECRET,
                 "ispconfig_endpoint": FAKE_ENDPOINT,
             },
             path,
@@ -80,7 +80,7 @@ class ISPConfigClientTest(unittest.TestCase):
 
         self.adapter = requests_mock.Adapter()
 
-        self.client = _ISPConfigClient(FAKE_ENDPOINT, FAKE_USER, FAKE_PW)
+        self.client = _ISPConfigClient(FAKE_ENDPOINT, FAKE_PREFIX, FAKE_SECRET)
         self.client.session.mount("mock", self.adapter)
 
     def _register_response(
@@ -98,8 +98,8 @@ class ISPConfigClientTest(unittest.TestCase):
 
             return (
                 (
-                    ("username" in data and data["username"] == FAKE_USER)
-                    and ("username" in data and data["password"] == FAKE_PW)
+                    ("prefix" in data and data["prefix"] == FAKE_PREFIX)
+                    and ("prefix" in data and data["secret"] == FAKE_SECRET)
                 )
                 or data["session_id"] == "FAKE_SESSION"
             ) and add_result

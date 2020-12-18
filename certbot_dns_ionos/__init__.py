@@ -1,16 +1,16 @@
 """
-The `~certbot_dns_ispconfig.dns_ispconfig` plugin automates the process of
+The `~certbot_dns_ionos.dns_ionos` plugin automates the process of
 completing a ``dns-01`` challenge (`~acme.challenges.DNS01`) by creating, and
-subsequently removing, TXT records using the ISPConfig REST API.
+subsequently removing, TXT records using the ionos REST API.
 
 
 Named Arguments
 ---------------
 
 ========================================  =====================================
-``--dns-ispconfig-credentials``           ISPConfig Remote API credentials_
+``--dns-ionos-credentials``           ionos Remote API credentials_
                                           INI file. (Required)
-``--dns-ispconfig-propagation-seconds``   The number of seconds to wait for DNS
+``--dns-ionos-propagation-seconds``   The number of seconds to wait for DNS
                                           to propagate before asking the ACME
                                           server to verify the DNS record.
                                           (Default: 120)
@@ -20,21 +20,21 @@ Named Arguments
 Credentials
 -----------
 
-Use of this plugin requires a configuration file containing ISPConfig Remote API
-credentials, obtained from your DNSimple
+Use of this plugin requires a configuration file containing ionos Remote API
+credentials, obtained from your DNS provider
 `System > Remote Users`.
 
 .. code-block:: ini
    :name: credentials.ini
    :caption: Example credentials file:
 
-   # ISPCONFIG API credentials used by Certbot
-   dns_ispconfig_username = myispremoteuser
-   dns_ispconfig_password = mysecretpassword
-   dns_ispconfig_endpoint = https://localhost:8080
+   # ionos API credentials used by Certbot
+   dns_ionos_username = myispremoteuser
+   dns_ionos_password = mysecretpassword
+   dns_ionos_endpoint = https://localhost:8080
 
 The path to this file can be provided interactively or using the
-``--dns-ispconfig-credentials`` command-line argument. Certbot records the path
+``--dns-ionos-credentials`` command-line argument. Certbot records the path
 to this file for use during renewal, but does not store the file's contents.
 
 .. caution::
@@ -59,8 +59,8 @@ Examples
    :caption: To acquire a certificate for ``example.com``
 
    certbot certonly \\
-     --dns-ispconfig \\
-     --dns-ispconfig-credentials ~/.secrets/certbot/ispconfig.ini \\
+     --dns-ionos \\
+     --dns-ionos-credentials ~/.secrets/certbot/ionos.ini \\
      -d example.com
 
 .. code-block:: bash
@@ -68,8 +68,8 @@ Examples
              ``www.example.com``
 
    certbot certonly \\
-     --dns-ispconfig \\
-     --dns-ispconfig-credentials ~/.secrets/certbot/ispconfig.ini \\
+     --dns-ionos \\
+     --dns-ionos-credentials ~/.secrets/certbot/ionos.ini \\
      -d example.com \\
      -d www.example.com
 
@@ -78,9 +78,9 @@ Examples
              for DNS propagation
 
    certbot certonly \\
-     --dns-ispconfig \\
-     --dns-ispconfig-credentials ~/.secrets/certbot/ispconfig.ini \\
-     --dns-ispconfig-propagation-seconds 240 \\
+     --dns-ionos \\
+     --dns-ionos-credentials ~/.secrets/certbot/ionos.ini \\
+     --dns-ionos-propagation-seconds 240 \\
      -d example.com
 
 """

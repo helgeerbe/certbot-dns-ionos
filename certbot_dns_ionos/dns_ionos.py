@@ -1,4 +1,4 @@
-"""DNS Authenticator for ISPConfig."""
+"""DNS Authenticator for IONOS."""
 import json
 import logging
 import time
@@ -16,12 +16,12 @@ logger = logging.getLogger(__name__)
 @zope.interface.implementer(interfaces.IAuthenticator)
 @zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(dns_common.DNSAuthenticator):
-    """DNS Authenticator for ISPConfig
+    """DNS Authenticator for IONOS
 
-    This Authenticator uses the ISPConfig Remote REST API to fulfill a dns-01 challenge.
+    This Authenticator uses the IONOS Remote REST API to fulfill a dns-01 challenge.
     """
 
-    description = "Obtain certificates using a DNS TXT record (if you are using ISPConfig for DNS)."
+    description = "Obtain certificates using a DNS TXT record (if you are using IONOS for DNS)."
     ttl = 60
 
     def __init__(self, *args, **kwargs):
@@ -33,53 +33,53 @@ class Authenticator(dns_common.DNSAuthenticator):
         super(Authenticator, cls).add_parser_arguments(
             add, default_propagation_seconds=120
         )
-        add("credentials", help="ISPConfig credentials INI file.")
+        add("credentials", help="IONOS credentials INI file.")
 
     def more_info(self):  # pylint: disable=missing-docstring,no-self-use
         return (
             "This plugin configures a DNS TXT record to respond to a dns-01 challenge using "
-            + "the ISPConfig Remote REST API."
+            + "the IONOS Remote REST API."
         )
 
     def _setup_credentials(self):
         self.credentials = self._configure_credentials(
             "credentials",
-            "ISPConfig credentials INI file",
+            "IONOS credentials INI file",
             {
-                "endpoint": "URL of the ISPConfig Remote API.",
-                "username": "Username for ISPConfig Remote API.",
-                "password": "Password for ISPConfig Remote API.",
+                "endpoint": "URL of the IONOS Remote API.",
+                "prefix": "Prefix for IONOS Remote API.",
+                "secret": "Secret for IONOS Remote API.",
             },
         )
 
     def _perform(self, domain, validation_name, validation):
-        self._get_ispconfig_client().add_txt_record(
+        self._get_ionos_client().add_txt_record(
             domain, validation_name, validation, self.ttl
         )
 
     def _cleanup(self, domain, validation_name, validation):
-        self._get_ispconfig_client().del_txt_record(
+        self._get_ionos_client().del_txt_record(
             domain, validation_name, validation, self.ttl
         )
 
-    def _get_ispconfig_client(self):
-        return _ISPConfigClient(
+    def _get_ionos_client(self):
+        return _ionosClient(
             self.credentials.conf("endpoint"),
-            self.credentials.conf("username"),
-            self.credentials.conf("password"),
+            self.credentials.conf("prefix"),
+            self.credentials.conf("secret"),
         )
 
 
-class _ISPConfigClient(object):
+class _ionosClient(object):
     """
-    Encapsulates all communication with the ISPConfig Remote REST API.
+    Encapsulates all communication with the IONOS Remote REST API.
     """
 
-    def __init__(self, endpoint, username, password):
-        logger.debug("creating ispconfigclient")
+    def __init__(self, endpoint, prefix, secret):
+        logger.debug("creating ionosclient")
         self.endpoint = endpoint
-        self.username = username
-        self.password = password
+        self.prefix = prefix
+        self.secret = secret
         self.session = requests.Session()
         self.session_id = None
 
@@ -87,7 +87,7 @@ class _ISPConfigClient(object):
         if self.session_id is not None:
             return
         logger.debug("logging in")
-        logindata = {"username": self.username, "password": self.password}
+        logindata = {"prefix": self.prefix, "secret": self.secret}
         self.session_id = self._api_request("login", logindata)
         logger.debug("session id is %s", self.session_id)
 
@@ -131,7 +131,7 @@ class _ISPConfigClient(object):
         :param str record_name: The record name (typically beginning with '_acme-challenge.').
         :param str record_content: The record content (typically the challenge validation).
         :param int record_ttl: The record TTL (number of seconds that the record may be cached).
-        :raises certbot.errors.PluginError: if an error occurs communicating with the ISPConfig API
+        :raises certbot.errors.PluginError: if an error occurs communicating with the IONOS API
         """
         self._login()
         zone_id, zone_name = self._find_managed_zone_id(domain, record_name)
@@ -165,7 +165,7 @@ class _ISPConfigClient(object):
         :param str record_name: The record name (typically beginning with '_acme-challenge.').
         :param str record_content: The record content (typically the challenge validation).
         :param int record_ttl: The record TTL (number of seconds that the record may be cached).
-        :raises certbot.errors.PluginError: if an error occurs communicating with the ISPConfig API
+        :raises certbot.errors.PluginError: if an error occurs communicating with the IONOS API
         """
         self._login()
         zone_id, zone_name = self._find_managed_zone_id(domain, record_name)

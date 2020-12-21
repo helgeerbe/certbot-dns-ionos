@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = "0.0.1"
+version = "0.0.2"
 
 install_requires = [
     "acme>=0.29.0",
@@ -56,8 +56,8 @@ setup(
     install_requires=install_requires,
     entry_points={
         "certbot.plugins": [
-            "dns-ispconfig = certbot_dns_ispconfig.dns_ispconfig:Authenticator"
+            "dns-ionos = certbot_dns_ionos.dns_ionos:Authenticator"
         ]
     },
-    test_suite="certbot_dns_ispconfig",
+    test_suite="certbot_dns_ionos",
 )

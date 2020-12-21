@@ -1,4 +1,4 @@
-"""Tests for certbot_dns_ispconfig.dns_ispconfig."""
+"""Tests for certbot_dns_ionos.dns_ionos."""
 
 import unittest
 
@@ -24,28 +24,28 @@ class AuthenticatorTest(
     def setUp(self):
         super(AuthenticatorTest, self).setUp()
 
-        from certbot_dns_ispconfig.dns_ispconfig import Authenticator
+        from certbot_dns_ionos.dns_ionos import Authenticator
 
         path = os.path.join(self.tempdir, "file.ini")
         dns_test_common.write(
             {
-                "ispconfig_prefix": FAKE_PREFIX,
-                "ispconfig_secret": FAKE_SECRET,
-                "ispconfig_endpoint": FAKE_ENDPOINT,
+                "ionos_prefix": FAKE_PREFIX,
+                "ionos_secret": FAKE_SECRET,
+                "ionos_endpoint": FAKE_ENDPOINT,
             },
             path,
         )
 
         super(AuthenticatorTest, self).setUp()
         self.config = mock.MagicMock(
-            ispconfig_credentials=path, ispconfig_propagation_seconds=0
+            ionos_credentials=path, ionos_propagation_seconds=0
         )  # don't wait during tests
 
-        self.auth = Authenticator(self.config, "ispconfig")
+        self.auth = Authenticator(self.config, "ionos")
 
         self.mock_client = mock.MagicMock()
-        # _get_ispconfig_client | pylint: disable=protected-access
-        self.auth._get_ispconfig_client = mock.MagicMock(return_value=self.mock_client)
+        # _get_ionos_client | pylint: disable=protected-access
+        self.auth._get_ionos_client = mock.MagicMock(return_value=self.mock_client)
 
     def test_perform(self):
         self.auth.perform([self.achall])
@@ -70,17 +70,17 @@ class AuthenticatorTest(
         self.assertEqual(expected, self.mock_client.mock_calls)
 
 
-class ISPConfigClientTest(unittest.TestCase):
+class ionosClientTest(unittest.TestCase):
     record_name = "foo"
     record_content = "bar"
     record_ttl = 42
 
     def setUp(self):
-        from certbot_dns_ispconfig.dns_ispconfig import _ISPConfigClient
+        from certbot_dns_ionos.dns_ionos import _ionosClient
 
         self.adapter = requests_mock.Adapter()
 
-        self.client = _ISPConfigClient(FAKE_ENDPOINT, FAKE_PREFIX, FAKE_SECRET)
+        self.client = _ionosClient(FAKE_ENDPOINT, FAKE_PREFIX, FAKE_SECRET)
         self.client.session.mount("mock", self.adapter)
 
     def _register_response(

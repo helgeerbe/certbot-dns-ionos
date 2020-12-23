@@ -33,16 +33,16 @@ Named Arguments
 To start using DNS authentication for ionos, pass the following arguments on
 certbot's command line:
 
-======================================== ==============================================
-``--authenticator dns-ionos``           | select the authenticator plugin (Required)
+=============================================== ===============================================
+``--authenticator dns-ionos``                   select the authenticator plugin (Required)
 
-``--dns-ionos-credentials``             | ionos Remote User credentials
-                                        | INI file. (Required)
+``--dns-ionos-credentials``                     ionos Remote User credentials
+                                                INI file. (Required)
 
-``--dns-ionos-propagation-seconds``     | waiting time for DNS to propagate before asking
-                                        | the ACME server to verify the DNS record.
-                                        | (Default: 10, Recommended: >= 600)
-======================================== ==============================================
+``--dns-ionos-propagation-seconds``             waiting time for DNS to propagate before asking
+                                                the ACME server to verify the DNS record.
+                                                (Default: 10, Recommended: >= 600)
+=============================================== ===============================================
 
 
 

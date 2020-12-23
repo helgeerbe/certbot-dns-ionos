@@ -97,7 +97,7 @@ class _ionosClient(object):
             # get the zone id
             if zone['name'] == domain:
                 return zone['id'], zone['name']
-        return None
+        return None, None
 
     def _api_request(self, type, action, data = None):
         url = self._get_url(action)

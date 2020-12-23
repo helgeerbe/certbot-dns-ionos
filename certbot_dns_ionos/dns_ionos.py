@@ -88,7 +88,7 @@ class _ionosClient(object):
 
         :param str domain: The domain for which to find the managed zone.
         :returns: The ID of the managed zone, if found.
-        :rtype: str
+        :rtype: str zone id, str zone name
         """
         logger.debug("get zones")
         zones = self._api_request(type='get', action="/dns/v1/zones")
@@ -151,15 +151,15 @@ class _ionosClient(object):
         if zone_id is None:
             raise errors.PluginError("Domain not known")
         logger.debug("domain found: %s with id: %s", zone_name, zone_id)
-        record = self.get_existing_txt(zone_id, record_name)
-        if record is not None:
-            if record["content"] == record_content:
-                logger.info("already there, id {0}".format(record["id"]))
+        content, id = self.get_existing_txt(zone_id, record_name)
+        if content is not None:
+            if content == record_content:
+                logger.info("already there, id {0}".format(id))
                 return
             else:
                 logger.info("update txt record")
                 self._update_txt_record(
-                    zone_id, record["id"], record_content, record_ttl
+                    zone_id, id, record_content, record_ttl
                 )
         else:
             logger.info("insert new txt record")
@@ -179,16 +179,11 @@ class _ionosClient(object):
         if zone_id is None:
             raise errors.PluginError("Domain not known")
         logger.debug("domain found: %s with id: %s", zone_name, zone_id)
-        record = self.get_existing_txt(zone_id, record_name)
-        if record is not None:
-            #seem record "content" is double quoted. Remove quotes
-            content = record["content"]
-            # or, if they only occur at start...
-            content = content.lstrip('\"')
-            content = content.rstrip('\"')
+        content, id = self.get_existing_txt(zone_id, record_name)
+        if content is not None:
             if content == record_content:
-                logger.debug("delete TXT record: %s", record["id"])
-                self._delete_txt_record(zone_id, record["id"])
+                logger.debug("delete TXT record: %s", id)
+                self._delete_txt_record(zone_id, id)
 
     def _update_txt_record(self, zone_id, primary_id, record_content, record_ttl):
         data = {}
@@ -226,8 +221,8 @@ class _ionosClient(object):
         :param str zone_id: The ID of the managed zone.
         :param str record_name: The record name (typically beginning with '_acme-challenge.').
 
-        :returns: TXT record value or None
-        :rtype: `string` or `None`
+        :returns: TXT record value or None, record id or None
+        :rtype: `string` or `None`, `string` or `None`
 
         """
         zone_data = self._api_request(type='get', action='/dns/v1/zones/{0}'.format(zone_id))
@@ -236,5 +231,9 @@ class _ionosClient(object):
                 entry["name"] == record_name
                 and entry["type"] == "TXT"
             ):
-                return entry
-        return None
+                #seems "content" is double quoted. Remove quotes
+                content = entry["content"]
+                content = content.lstrip('\"')
+                content = content.rstrip('\"')
+                return content, entry["id"]
+        return None, None

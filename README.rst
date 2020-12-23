@@ -33,19 +33,17 @@ Named Arguments
 To start using DNS authentication for ionos, pass the following arguments on
 certbot's command line:
 
-============================================================= ==============================================
-``--authenticator certbot-dns-ionos:dns-ionos``               select the authenticator plugin (Required)
+======================================== ==============================================
+``--authenticator dns-ionos``             select the authenticator plugin (Required)
 
-``--certbot-dns-ionos:dns-ionos-credentials``                 ionos Remote User credentials
-                                                              INI file. (Required)
+``--dns-ionos-credentials``               ionos Remote User credentials
+                                          INI file. (Required)
 
-``--certbot-dns-ionos:dns-ionos-propagation-seconds``         | waiting time for DNS to propagate before asking
-                                                              | the ACME server to verify the DNS record.
-                                                              | (Default: 10, Recommended: >= 600)
-============================================================= ==============================================
+``--dns-ionos-propagation-seconds``     | waiting time for DNS to propagate before asking
+                                        | the ACME server to verify the DNS record.
+                                        | (Default: 10, Recommended: >= 600)
+======================================== ==============================================
 
-(Note that the verbose and seemingly redundant ``certbot-dns-ionos:`` prefix
-is currently imposed by certbot for external plugins.)
 
 
 Credentials
@@ -60,7 +58,7 @@ An example ``credentials.ini`` file:
    dns_ionos_endpoint = https://api.hosting.ionos.com
 
 The path to this file can be provided interactively or using the
-``--certbot-dns-ionos:dns-ionos-credentials`` command-line argument. Certbot
+``--dns-ionos-credentials`` command-line argument. Certbot
 records the path to this file for use during renewal, but does not store the
 file's contents.
 
@@ -88,9 +86,9 @@ To acquire a single certificate for both ``example.com`` and
 .. code-block:: bash
 
    certbot certonly \
-     --authenticator certbot-dns-ionos:dns-ionos \
-     --certbot-dns-ionos:dns-ionos-credentials /etc/letsencrypt/.secrets/domain.tld.ini \
-     --certbot-dns-ionos:dns-ionos-propagation-seconds 900 \
+     --authenticator dns-ionos \
+     --dns-ionos-credentials /etc/letsencrypt/.secrets/domain.tld.ini \
+     --dns-ionos-propagation-seconds 900 \
      --server https://acme-v02.api.letsencrypt.org/directory \
      --agree-tos \
      --rsa-key-size 4096 \
@@ -120,9 +118,9 @@ Once that's finished, the application can be run as follows::
        -v /etc/letsencrypt:/etc/letsencrypt \
        --cap-drop=all \
        certbot/dns-ionos certonly \
-       --authenticator certbot-dns-ionos:dns-ionos \
-       --certbot-dns-ionos:dns-ionos-propagation-seconds 900 \
-       --certbot-dns-ionos:dns-ionos-credentials \
+       --authenticator dns-ionos \
+       --dns-ionos-propagation-seconds 900 \
+       --dns-ionos-credentials \
            /etc/letsencrypt/.secrets/domain.tld.ini \
        --no-self-upgrade \
        --keep-until-expiring --non-interactive --expand \

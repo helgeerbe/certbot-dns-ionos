@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "/home/pi/dev/certbot/venv3/bin/certbot",
             "console": "integratedTerminal",
-            "args": ["certonly", "-a", "dns-ionos", "-d", "*.examaple.de", "--dns-ionos-credentials", "/home/pi/dev/certbot-dns-ionos/my_debug/secrets/credentials.ini", "--config-dir", "my_debug/config", "--work-dir", "my_debug/work", "--logs-dir", "my_debug/logs"]
+            "args": ["certonly", "-a", "dns-ionos", "-d", "*.erbehome.de", "--dns-ionos-credentials", "/home/pi/dev/certbot-dns-ionos/my_debug/secrets/credentials.ini", "--config-dir", "my_debug/config", "--work-dir", "my_debug/work", "--logs-dir", "my_debug/logs"]
         }
     ]
 }

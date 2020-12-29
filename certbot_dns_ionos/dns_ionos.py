@@ -120,7 +120,8 @@ class _ionosClient(object):
             )
         logger.debug("API REquest to URL: %s", url)
         if resp.status_code != 200:
-            error_msg = resp.reason + " " + resp.text['message']
+            content = json.loads(resp.content)
+            error_msg = resp.reason + " " + content['message']
             raise errors.PluginError(
                 "HTTP Error during request {0}:{1}".format(resp.status_code, error_msg)
             )

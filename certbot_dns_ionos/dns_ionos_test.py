@@ -77,91 +77,98 @@ class ionosClientTest(unittest.TestCase):
 
     def setUp(self):
         from certbot_dns_ionos.dns_ionos import _ionosClient
-
-        self.adapter = requests_mock.Adapter()
-
         self.client = _ionosClient(FAKE_ENDPOINT, FAKE_PREFIX, FAKE_SECRET)
-        self.client.session.mount("mock", self.adapter)
-
-    def _register_response(
-        self, ep_id, response=None, message=None, additional_matcher=None, **kwargs
-    ):
-        resp = {"code": "ok", "message": message, "response": response}
-        if message is not None:
-            resp["code"] = "remote_failure"
-
-        def add_matcher(request):
-            data = json.loads(request.text)
-            add_result = True
-            if additional_matcher is not None:
-                add_result = additionsal_matcher(request)
-
-            return (
-                (
-                    ("prefix" in data and data["prefix"] == FAKE_PREFIX)
-                    and ("prefix" in data and data["secret"] == FAKE_SECRET)
-                )
-                or data["session_id"] == "FAKE_SESSION"
-            ) and add_result
-
-        self.adapter.register_uri(
-            requests_mock.ANY,
-            "{0}?{1}".format(FAKE_ENDPOINT, ep_id),
-            text=json.dumps(resp),
-            additional_matcher=add_matcher,
-            **kwargs
-        )
 
     def test_add_txt_record(self):
-        self._register_response("login", response="FAKE_SESSION")
-        self._register_response("dns_zone_get_id", response=23)
-        self._register_response("dns_txt_add", response=99)
-        self._register_response(
-            "dns_zone_get", response={"zone_id": 102, "server_id": 1}
-        )
-        self._register_response("dns_rr_get_all_by_zone", response=[])
-        self.client.add_txt_record(
-            DOMAIN, self.record_name, self.record_content, self.record_ttl
-        )
+        with requests_mock.Mocker() as m:
+            mock_response = [{
+                "id": "11af3414-ebba-11e9-8df5-66fbe8a334b4",
+                "name": "example.com",
+                "type": "NATIVE"}]
+            m.register_uri('GET', 'mock://endpoint/dns/v1/zones', status_code=200, reason="OK", json=mock_response)
+            mock_response = {
+                "id": "11af3414-ebba-11e9-8df5-66fbe8a334b4",
+                "name": "example.com",
+                "type": "NATIVE",
+                "records": [
+                    {
+                    "id": "22af3414-abbe-9e11-5df5-66fbe8e334b4",
+                    "name": "foo",
+                    "rootName": "string",
+                    "type": "TXT",
+                    "content": "string",
+                    "changeDate": "string",
+                    "ttl": 0,
+                    "prio": 0,
+                    "disabled": False
+                    }
+                ]
+            }
+            m.register_uri('GET', 'mock://endpoint/dns/v1/zones/11af3414-ebba-11e9-8df5-66fbe8a334b4', status_code=200, reason="OK", json=mock_response)
+            m.register_uri('PUT', 'mock://endpoint/dns/v1/zones/11af3414-ebba-11e9-8df5-66fbe8a334b4/records/22af3414-abbe-9e11-5df5-66fbe8e334b4', status_code=200, reason="OK")
+            try:
+                self.client.add_txt_record(
+                    DOMAIN, self.record_name, self.record_content, self.record_ttl
+                )
+            except:
+                self.fail("No exeption expected")
 
     def test_add_txt_record_fail_to_find_domain(self):
-        self._register_response("login", response="FAKE_SESSION")
-        self._register_response("dns_zone_get_id", message="Not Found")
-        with self.assertRaises(errors.PluginError) as context:
-            self.client.add_txt_record(
-                DOMAIN, self.record_name, self.record_content, self.record_ttl
-            )
+        with requests_mock.Mocker() as m:
+            mock_response = [{
+                "id": "11af3414-ebba-11e9-8df5-66fbe8a334b4",
+                "name": "test.com",
+                "type": "NATIVE"}]
+            m.register_uri('GET', 'mock://endpoint/dns/v1/zones', status_code=200, reason="OK", json=mock_response)
+            with self.assertRaises(errors.PluginError) as context:
+                self.client.add_txt_record(
+                    DOMAIN, self.record_name, self.record_content, self.record_ttl
+                )
 
+    
     def test_add_txt_record_fail_to_authenticate(self):
-        self._register_response("login", message="FAILED")
-        with self.assertRaises(errors.PluginError) as context:
-            self.client.add_txt_record(
-                DOMAIN, self.record_name, self.record_content, self.record_ttl
-            )
+        with requests_mock.Mocker() as m:
+            mock_response = {'message': 'Missing or invalid API key.'}
+            m.register_uri('GET', 'mock://endpoint/dns/v1/zones', status_code=401, reason="Unauthorized", json=mock_response)
+            with self.assertRaises(errors.PluginError) as context:
+                self.client.add_txt_record(
+                    DOMAIN, self.record_name, self.record_content, self.record_ttl
+                )
 
     def test_del_txt_record(self):
-        self._register_response("login", response="FAKE_SESSION")
-        self._register_response("dns_zone_get_id", response=23)
-        self._register_response("dns_rr_get_all_by_zone", response=[])
-        self._register_response("dns_txt_delete", response="")
-        self.client.del_txt_record(
-            DOMAIN, self.record_name, self.record_content, self.record_ttl
-        )
+        with requests_mock.Mocker() as m:
+            mock_response = [{
+                "id": "11af3414-ebba-11e9-8df5-66fbe8a334b4",
+                "name": "example.com",
+                "type": "NATIVE"}]
+            m.register_uri('GET', 'mock://endpoint/dns/v1/zones', status_code=200, reason="OK", json=mock_response)
+            mock_response = {
+                "id": "11af3414-ebba-11e9-8df5-66fbe8a334b4",
+                "name": "example.com",
+                "type": "NATIVE",
+                "records": [
+                    {
+                    "id": "22af3414-abbe-9e11-5df5-66fbe8e334b4",
+                    "name": "foo",
+                    "rootName": "string",
+                    "type": "TXT",
+                    "content": "string",
+                    "changeDate": "string",
+                    "ttl": 0,
+                    "prio": 0,
+                    "disabled": False
+                    }
+                ]
+            }
+            m.register_uri('GET', 'mock://endpoint/dns/v1/zones/11af3414-ebba-11e9-8df5-66fbe8a334b4', status_code=200, reason="OK", json=mock_response)
+            m.register_uri('DELETE', 'mock://endpoint/dns/v1/zones/11af3414-ebba-11e9-8df5-66fbe8a334b4/records/22af3414-abbe-9e11-5df5-66fbe8e334b4', status_code=200, reason="OK")
+            try:
+                self.client.del_txt_record(
+                    DOMAIN, self.record_name, self.record_content, self.record_ttl
+                )
+            except:
+                    self.fail("No exeption expected")
 
-    def test_del_txt_record_fail_to_find_domain(self):
-        self._register_response("login", response="FAKE_SESSION")
-        self._register_response("dns_zone_get_id", message="Not Found")
-        with self.assertRaises(errors.PluginError) as context:
-            self.client.del_txt_record(
-                DOMAIN, self.record_name, self.record_content, self.record_ttl
-            )
-
-    def test_del_txt_record_fail_to_authenticate(self):
-        self._register_response("login", message="FAILED")
-        with self.assertRaises(errors.PluginError) as context:
-            self.client.del_txt_record(
-                DOMAIN, self.record_name, self.record_content, self.record_ttl
-            )
 
 
 if __name__ == "__main__":

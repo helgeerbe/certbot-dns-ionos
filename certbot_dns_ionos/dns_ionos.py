@@ -97,6 +97,12 @@ class _ionosClient(object):
             # get the zone id
             if zone['name'] == domain:
                 return zone['id'], zone['name']
+        # if the domain does not exactly match one of the zones, check if it
+        # is a subdomain
+        for zone in zones:
+            # get the zone id
+            if domain.endswith(zone['name']):
+                return zone['id'], zone['name']
         return None, None
 
     def _api_request(self, type, action, data = None):

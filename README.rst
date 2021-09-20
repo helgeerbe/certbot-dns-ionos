@@ -134,6 +134,10 @@ chmod 600 /etc/letsencrypt/.secrets
 Changelog
 =========
 
+- 2021.09.20post1
+
+  - Fix version number
+
 - 2021.09.20
   
   - Fix #9 Domain not known when using subdomain

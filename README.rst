@@ -130,3 +130,10 @@ Once that's finished, the application can be run as follows::
 It is suggested to secure the folder as follows::
 chown root:root /etc/letsencrypt/.secrets
 chmod 600 /etc/letsencrypt/.secrets
+
+Changelog
+=========
+
+- 2021.09.20
+  
+  - Fix #9 Domain not known when using subdomain

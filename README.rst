@@ -134,7 +134,7 @@ chmod 600 /etc/letsencrypt/.secrets
 Changelog
 =========
 
-- 2021.09.20post1
+- 2021.09.20.post1
 
   - Fix version number
 

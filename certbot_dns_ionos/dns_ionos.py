@@ -53,6 +53,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         )
 
     def _perform(self, domain, validation_name, validation):
+        logger.debug(f"_perform called with: domain: {domain}, validation_name: {validation_name}, validation: {validation}")
         self._get_ionos_client().add_txt_record(
             domain, validation_name, validation, self.ttl
         )

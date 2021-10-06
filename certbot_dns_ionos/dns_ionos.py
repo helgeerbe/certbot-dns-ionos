@@ -53,14 +53,15 @@ class Authenticator(dns_common.DNSAuthenticator):
         )
 
     def _perform(self, domain, validation_name, validation):
+        logger.debug(f"_perform called with: domain: {domain}, validation_name: {validation_name}, validation: {validation}")
         self._get_ionos_client().add_txt_record(
             domain, validation_name, validation, self.ttl
         )
 
     def _cleanup(self, domain, validation_name, validation):
-        self._get_ionos_client().del_txt_record(
-            domain, validation_name, validation, self.ttl
-        )
+        self._get_ionos_client().del_matching_records(
+            domain, validation_name
+            )
 
     def _get_ionos_client(self):
         return _ionosClient(
@@ -164,42 +165,14 @@ class _ionosClient(object):
                 logger.info("already there, id {0}".format(id))
                 return
             else:
-                logger.info("update txt record")
-                self._update_txt_record(
-                    zone_id, id, record_content, record_ttl
+                logger.info("adding additional record")
+                entries = self.clean_entries(self.get_existing_records(zone_id, record_name))
+                self.add_additional_record(
+                    zone_id, record_name, record_content, record_ttl, entries
                 )
         else:
             logger.info("insert new txt record")
             self._insert_txt_record(zone_id, record_name, record_content, record_ttl)
-
-    def del_txt_record(self, domain, record_name, record_content, record_ttl):
-        """
-        Delete a TXT record using the supplied information.
-
-        :param str domain: The domain to use to look up the managed zone.
-        :param str record_name: The record name (typically beginning with '_acme-challenge.').
-        :param str record_content: The record content (typically the challenge validation).
-        :param int record_ttl: The record TTL (number of seconds that the record may be cached).
-        :raises certbot.errors.PluginError: if an error occurs communicating with the IONOS API
-        """
-        zone_id, zone_name = self._find_managed_zone_id(domain)
-        if zone_id is None:
-            raise errors.PluginError("Domain not known")
-        logger.debug("domain found: %s with id: %s", zone_name, zone_id)
-        content, id = self.get_existing_txt(zone_id, record_name)
-        if content is not None:
-            if content == record_content:
-                logger.debug("delete TXT record: %s", id)
-                self._delete_txt_record(zone_id, id)
-
-    def _update_txt_record(self, zone_id, primary_id, record_content, record_ttl):
-        data = {}
-        data['disabled'] = False
-        data['content'] = record_content
-        data['ttl'] = record_ttl
-        data['prio'] = 0
-        logger.debug("update with data: %s", data)
-        self._api_request(type='put', action='/dns/v1/zones/{0}/records/{1}'.format(zone_id,primary_id), data=data)
 
     def _insert_txt_record(self, zone_id, record_name, record_content, record_ttl):
         data = {}
@@ -244,3 +217,61 @@ class _ionosClient(object):
                 content = content.rstrip('\"')
                 return content, entry["id"]
         return None, None
+
+    def get_existing_records(self, zone_id, record_name):
+        """
+        Pull a list of existing TXT records with the record_name
+        """
+        zone_data = self._api_request(type='get', action='/dns/v1/zones/{0}'.format(zone_id))
+        results = []
+        for entry in zone_data['records']:
+            if entry["name"] == record_name and entry["type"] == "TXT":
+                results.append(entry)
+        return results
+
+    def clean_entries(self, entries):
+        """
+        Clean up existing DNS entries to prepare to write them back to the API
+            by only including certain keys and cleaning up the content.
+        """
+        results = []
+        for entry in entries:
+            results.append({
+                'name': entry['name'],
+                'type': entry['type'],
+                'content': entry['content'].replace('"', ''),  # Strip double-quotes
+                'ttl': entry['ttl'],
+                'disabled': entry['disabled'],
+            })
+        return results
+
+    def add_additional_record(self, zone_id, record_name, record_content, record_ttl, existing_records):
+        """
+        Add another TXT record with the record_name but with new content. This
+            is done to allow multiple domains to be validated at the same time.
+        existing_records is a list of existing records since we need to issue
+            a PATCH and include the existing records.
+        """
+        data = {}
+        data['disabled'] = False
+        data['type'] = 'TXT'
+        data['name'] = record_name
+        data['content'] = record_content
+        data['ttl'] = record_ttl
+        data['prio'] = 0
+        existing_records.append(data)
+        logger.debug("insert with data: %s", existing_records)
+        self._api_request(type='patch', action='/dns/v1/zones/{0}'.format(zone_id), data=existing_records)
+
+    def del_matching_records(self, domain, record_name):
+        """
+        Deletes any TXT records with matching record_name. Loops through all
+            records with that name and deletes them.
+        """
+        zone_id, zone_name = self._find_managed_zone_id(domain)
+        if zone_id is None:
+            raise errors.PluginError("Domain not known")
+        logger.debug("domain found: %s with id: %s", zone_name, zone_id)
+        entries = self.get_existing_records(zone_id, record_name)
+        for entry in entries:
+            self._delete_txt_record(zone_id, entry['id'])

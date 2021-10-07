@@ -125,7 +125,7 @@ class _ionosClient(object):
             raise errors.PluginError(
                 "HTTP Error during request. Unknown type {0}".format(type)
             )
-        logger.debug("API REquest to URL: %s", url)
+        logger.debug("API request to URL: %s", url)
         if resp.status_code != 200:
             content = json.loads(resp.content)[0] # on error content is array with 1 element
             error_msg = resp.reason + " " + content['message']

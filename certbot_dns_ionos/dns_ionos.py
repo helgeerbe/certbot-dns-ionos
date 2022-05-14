@@ -114,22 +114,21 @@ class _ionosClient(object):
             headers = self.headers
             headers['Content-Type'] = 'application/json'
             resp = requests.put(url, headers=headers, data=json.dumps(data))
-        elif type == 'patch':
+        elif type == 'post':
             headers = self.headers
             headers['Content-Type'] = 'application/json'
-            resp = requests.patch(url, headers=headers, data=json.dumps(data))
+            resp = requests.post(url, headers=headers, data=json.dumps(data))
         elif type == 'delete':
             resp = requests.delete(url, headers=self.headers)
         else:
             raise errors.PluginError(
                 "HTTP Error during request. Unknown type {0}".format(type)
             )
-        logger.debug("API REquest to URL: %s", url)
-        if resp.status_code != 200:
+        logger.debug("API Request to URL: %s", url)
+        if not resp.ok:
             content = json.loads(resp.content)
-            error_msg = resp.reason + " " + content['message']
             raise errors.PluginError(
-                "HTTP Error during request {0}:{1}".format(resp.status_code, error_msg)
+                "HTTP Error during request {0}:{1}".format(resp.status_code, content)
             )
         result = None
         if type == 'get':
@@ -158,19 +157,13 @@ class _ionosClient(object):
         if zone_id is None:
             raise errors.PluginError("Domain not known")
         logger.debug("domain found: %s with id: %s", zone_name, zone_id)
-        content, id = self.get_existing_txt(zone_id, record_name)
-        if content is not None:
-            if content == record_content:
-                logger.info("already there, id {0}".format(id))
+        entries = self.get_existing_txts(zone_id, record_name)
+        for entry in entries:
+            if entry[0] == record_content:
+                logger.info("already there, id {0} with content {1}".format(entry[1], entry[0]))
                 return
-            else:
-                logger.info("update txt record")
-                self._update_txt_record(
-                    zone_id, id, record_content, record_ttl
-                )
-        else:
-            logger.info("insert new txt record")
-            self._insert_txt_record(zone_id, record_name, record_content, record_ttl)
+        logger.info("insert new txt record")
+        self._insert_txt_record(zone_id, record_name, record_content, record_ttl)
 
     def del_txt_record(self, domain, record_name, record_content, record_ttl):
         """
@@ -186,11 +179,10 @@ class _ionosClient(object):
         if zone_id is None:
             raise errors.PluginError("Domain not known")
         logger.debug("domain found: %s with id: %s", zone_name, zone_id)
-        content, id = self.get_existing_txt(zone_id, record_name)
-        if content is not None:
-            if content == record_content:
-                logger.debug("delete TXT record: %s", id)
-                self._delete_txt_record(zone_id, id)
+        entries = self.get_existing_txts(zone_id, record_name)
+        maybe_entry = next(filter(lambda x: x[0] == record_content, entries), None)
+        if maybe_entry is not None:
+            self._delete_txt_record(zone_id, maybe_entry[1])
 
     def _update_txt_record(self, zone_id, primary_id, record_content, record_ttl):
         data = {}
@@ -212,35 +204,23 @@ class _ionosClient(object):
         records = []
         records.append(data)
         logger.debug("insert with data: %s", data)
-        self._api_request(type='patch', action='/dns/v1/zones/{0}'.format(zone_id), data=records)
+        self._api_request(type='post', action='/dns/v1/zones/{0}/records'.format(zone_id), data=records)
 
     def _delete_txt_record(self, zone_id, primary_id):
         logger.debug("delete id: %s", primary_id)
         self._api_request(type='delete', action='/dns/v1/zones/{0}/records/{1}'.format(zone_id,primary_id))
 
-    def get_existing_txt(self, zone_id, record_name):
+    def get_existing_txts(self, zone_id, record_name):
         """
         Get existing TXT records from the RRset for the record name.
-
-        If an error occurs while requesting the record set, it is suppressed
-        and None is returned.
 
         :param str zone_id: The ID of the managed zone.
         :param str record_name: The record name (typically beginning with '_acme-challenge.').
 
-        :returns: TXT record value or None, record id or None
-        :rtype: `string` or `None`, `string` or `None`
-
+        :returns: List of all TXT records with the provided record_name as tuple (content, id)
+        :rtype: list[str, str]
         """
         zone_data = self._api_request(type='get', action='/dns/v1/zones/{0}'.format(zone_id))
-        for entry in zone_data['records']:
-            if (
-                entry["name"] == record_name
-                and entry["type"] == "TXT"
-            ):
-                #seems "content" is double quoted. Remove quotes
-                content = entry["content"]
-                content = content.lstrip('\"')
-                content = content.rstrip('\"')
-                return content, entry["id"]
-        return None, None
+        entries = filter(lambda x: x["name"] == record_name and x["type"] == "TXT", zone_data['records'])
+        # seems "content" is double quoted. Remove quotes from content
+        return list(map(lambda x: (x["content"].lstrip('\"').rstrip('\"'), x["id"]), entries))

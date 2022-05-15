@@ -135,6 +135,9 @@ chmod 700 /etc/letsencrypt/.secrets
 Changelog
 =========
 
+- 2022.05.15
+  - Added capability to handle multiple domain validations #16
+
 - 2021.09.20.post1
 
   - Fix version number

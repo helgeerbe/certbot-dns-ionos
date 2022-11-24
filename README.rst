@@ -137,9 +137,10 @@ Changelog
 
 - 2022.11.24
   - remove zope to fix compatibility with Certbot 2.x (Fixes #19)
-    As a reminder, Certbot will default to issuing ECDSA certificates from release 2.0.0.
-    If you update from a prior certbot release, run the plugin once manually. You will be prompted
-    to update RSA key type to ECDSA.
+  
+  As a reminder, Certbot will default to issuing ECDSA certificates from release 2.0.0.
+  If you update from a prior certbot release, run the plugin once manually. You will be prompted
+  to update RSA key type to ECDSA.
 
 - 2022.05.15
   - Added capability to handle multiple domain validations #16

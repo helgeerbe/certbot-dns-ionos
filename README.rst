@@ -74,7 +74,8 @@ accessed by other users on your system. The warning reads "Unsafe permissions
 on credentials configuration file", followed by the path to the credentials
 file. This warning will be emitted each time Certbot uses the credentials file,
 including for renewal, and cannot be silenced except by addressing the issue
-(e.g., by using a command like ``chmod 600`` to restrict access to the file).
+(e.g., by using a command like ``chmod 600`` to restrict access to the file and 
+``chmod 700`` to restrict access to the folder).
 
 
 Examples
@@ -129,10 +130,13 @@ Once that's finished, the application can be run as follows::
 
 It is suggested to secure the folder as follows::
 chown root:root /etc/letsencrypt/.secrets
-chmod 600 /etc/letsencrypt/.secrets
+chmod 700 /etc/letsencrypt/.secrets
 
 Changelog
 =========
+
+- 2022.05.15
+  - Added capability to handle multiple domain validations #16
 
 - 2021.09.20.post1
 

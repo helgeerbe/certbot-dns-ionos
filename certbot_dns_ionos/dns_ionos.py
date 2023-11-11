@@ -97,7 +97,7 @@ class _ionosClient(object):
         # is a subdomain
         for zone in zones:
             # get the zone id
-            if domain.endswith(zone['name']):
+            if domain.endswith(f".{zone['name']}"):
                 return zone['id'], zone['name']
         return None, None
 

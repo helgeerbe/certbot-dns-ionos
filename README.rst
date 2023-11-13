@@ -136,10 +136,11 @@ Changelog
 =========
 
 - 2023.11.13
-  - Fix managed zone lookup to ensure correct domain is selected where there are two 
-    domains with the same ending e.g. example.com and thisisanexample.com (PR #22)
+
+  - Fix managed zone lookup to ensure correct domain is selected where there are two domains with the same ending e.g. example.com and thisisanexample.com (PR #22)
 
 - 2022.11.24
+
   - remove zope to fix compatibility with Certbot 2.x (Fixes #19)
   
   As a reminder, Certbot will default to issuing ECDSA certificates from release 2.0.0.

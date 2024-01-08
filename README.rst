@@ -57,6 +57,8 @@ An example ``credentials.ini`` file:
    dns_ionos_secret = verysecureapikeysecret
    dns_ionos_endpoint = https://api.hosting.ionos.com
 
+The key can be managed under the following link:  https://developer.hosting.ionos.de/?source=IonosControlPanel
+
 The path to this file can be provided interactively or using the
 ``--dns-ionos-credentials`` command-line argument. Certbot
 records the path to this file for use during renewal, but does not store the
@@ -131,6 +133,8 @@ Once that's finished, the application can be run as follows::
 It is suggested to secure the folder as follows::
 chown root:root /etc/letsencrypt/.secrets
 chmod 700 /etc/letsencrypt/.secrets
+
+The file 'domain.tld.ini' must be replaced with the version of the example 'credentials.ini' adapted to your provider. 
 
 Changelog
 =========

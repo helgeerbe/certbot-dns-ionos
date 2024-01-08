@@ -139,6 +139,11 @@ The file 'domain.tld.ini' must be replaced with the version of the example 'cred
 Changelog
 =========
 
+- 2024.01.08
+
+  - Update README.rst 
+    - Add Link to IONOS control panel and reference between credentials.ini and domain.tld.ini
+
 - 2023.11.13
 
   - Fix managed zone lookup to ensure correct domain is selected where there are two domains with the same ending e.g. example.com and thisisanexample.com (PR #22)

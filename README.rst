@@ -169,7 +169,7 @@ Changelog
 
 
 Related Plugins
-------
+-----------------
 
 It's important to note that this plugin targets IONOS `Domain Name Registration
 <https://www.ionos.com/domains/domain-names>`_ service. 

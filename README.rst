@@ -171,7 +171,7 @@ Changelog
 Related Plugins
 -----------------
 
-It's important to note that this plugin targets IONOS `Domain Name Registration
-<https://www.ionos.com/domains/domain-names>`_ service. 
+It's important to note that this plugin targets IONOS `IONOS Developer DNS API
+<https://developer.hosting.ionos.com/docs/dns>`_. 
 If you are using IONOS `Cloud DNS service<https://cloud.ionos.com/network/cloud-dns>`_, 
 there is a different plugin provided by IONOS: https://github.com/ionos-cloud/certbot-dns-ionos-cloud

@@ -1,13 +1,13 @@
-certbot-dns-ionos
-=====================
+# certbot-dns-ionos
 
-IONOS_ DNS Authenticator plugin for Certbot_
+IONOS DNS Authenticator plugin for Certbot
+
+![Ionos](https://www.ionos.co.uk/newsroom/wp-content/uploads/sites/7/2021/12/LOGO_IONOS_Blue_RGB-1.png)
 
 This plugin automates the process of completing a ``dns-01`` challenge by
 creating, and subsequently removing, TXT records using the IONOS Remote API.
 
-Configuration of IONOS
----------------------------
+## Configuration of IONOS
 
 In the `System -> Remote Users` you have to have a user, with the following rights
 
@@ -19,52 +19,48 @@ In the `System -> Remote Users` you have to have a user, with the following righ
 .. _IONOS: https://www.ionos.de/
 .. _Certbot: https://certbot.eff.org/
 
-Installation
-------------
+## Installation
 
-::
+### Snap
 
-    pip install certbot-dns-ionos
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/certbot-dns-ionos)
 
 
-Named Arguments
----------------
+### Pip
+
+`pip install certbot-dns-ionos`
+
+
+## Named Arguments
 
 To start using DNS authentication for ionos, pass the following arguments on
 certbot's command line:
-
-=============================================== ===============================================
-``--authenticator dns-ionos``                   select the authenticator plugin (Required)
-
-``--dns-ionos-credentials``                     ionos Remote User credentials
-                                                INI file. (Required)
-
-``--dns-ionos-propagation-seconds``             waiting time for DNS to propagate before asking
-                                                the ACME server to verify the DNS record.
-                                                (Default: 10, Recommended: >= 600)
-=============================================== ===============================================
+| Command args | Command definition |
+| --- | --- |
+|``--authenticator dns-ionos`` | select the authenticator plugin (Required) |
+|``--dns-ionos-credentials`` |ionos Remote User credentials INI file. (Required) |
+|``--dns-ionos-propagation-seconds``|waiting time for DNS to propagate before asking the ACME server to verify the DNS record. (Default: 10, Recommended: >= 600) |
 
 
 
-Credentials
------------
+## Credentials
 
 An example ``credentials.ini`` file:
 
-.. code-block:: ini
-
+```ini
    dns_ionos_prefix = myapikeyprefix
    dns_ionos_secret = verysecureapikeysecret
    dns_ionos_endpoint = https://api.hosting.ionos.com
-
+```
 The key can be managed under the following link:  https://developer.hosting.ionos.de/?source=IonosControlPanel
 
 The path to this file can be provided interactively or using the
-``--dns-ionos-credentials`` command-line argument. Certbot
+`--dns-ionos-credentials` command-line argument. Certbot
 records the path to this file for use during renewal, but does not store the
 file's contents.
 
-**CAUTION:** You should protect these API credentials as you would the
+> [!CAUTION]
+> You should protect these API credentials as you would the
 password to your ionos account. Users who can read this file can use these
 credentials to issue arbitrary API calls on your behalf. Users who can cause
 Certbot to run using these credentials can complete a ``dns-01`` challenge to
@@ -80,14 +76,12 @@ including for renewal, and cannot be silenced except by addressing the issue
 ``chmod 700`` to restrict access to the folder).
 
 
-Examples
---------
+## Examples
 
 To acquire a single certificate for both ``example.com`` and
 ``*.example.com``, waiting 900 seconds for DNS propagation:
 
-.. code-block:: bash
-
+```bash
    certbot certonly \
      --authenticator dns-ionos \
      --dns-ionos-credentials /etc/letsencrypt/.secrets/domain.tld.ini \
@@ -97,25 +91,25 @@ To acquire a single certificate for both ``example.com`` and
      --rsa-key-size 4096 \
      -d 'example.com' \
      -d '*.example.com'
-
-
-Docker
-------
+```
+## Docker
 
 In order to create a docker container with a certbot-dns-ionos installation,
 create an empty directory with the following ``Dockerfile``:
 
-.. code-block:: docker
+```docker
 
     FROM certbot/certbot
     RUN pip install certbot-dns-ionos
+```
 
-Proceed to build the image::
+Proceed to build the image
 
+```docker
     docker build -t certbot/dns-ionos .
-
+```
 Once that's finished, the application can be run as follows::
-
+```docker
     docker run --rm \
        -v /var/lib/letsencrypt:/var/lib/letsencrypt \
        -v /etc/letsencrypt:/etc/letsencrypt \
@@ -129,15 +123,15 @@ Once that's finished, the application can be run as follows::
        --keep-until-expiring --non-interactive --expand \
        --server https://acme-v02.api.letsencrypt.org/directory \
        -d example.com -d '*.example.com'
-
-It is suggested to secure the folder as follows::
+```
+It is suggested to secure the folder as follows
+```bash
 chown root:root /etc/letsencrypt/.secrets
 chmod 700 /etc/letsencrypt/.secrets
-
+```
 The file 'domain.tld.ini' must be replaced with the version of the example 'credentials.ini' adapted to your provider. 
 
-Changelog
-=========
+## Changelog
 
 - 2024.01.08
 

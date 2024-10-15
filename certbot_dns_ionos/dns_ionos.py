@@ -26,7 +26,7 @@ class Authenticator(dns_common.DNSAuthenticator):
     @classmethod
     def add_parser_arguments(cls, add):  # pylint: disable=arguments-differ
         super(Authenticator, cls).add_parser_arguments(
-            add, default_propagation_seconds=120
+            add, default_propagation_seconds=30
         )
         add("credentials", help="IONOS credentials INI file.")
 
@@ -122,10 +122,10 @@ class _ionosClient(object):
             )
         logger.debug("API request to URL: %s", url)
         if resp.status_code != 200:
-            content = json.loads(resp.content)[0] # on error content is array with 1 element
-            error_msg = resp.reason + " " + content['message']
+            content = json.loads(resp.content) # on error content is array with 1 element
+            error_msg = "" if content['message'] is None else content['message']
             raise errors.PluginError(
-                "HTTP Error during request {0}:{1}".format(resp.status_code, error_msg)
+                "HTTP Error during request {0}: {1}".format(resp.reason, error_msg)
             )
         result = None
         if type == 'get':

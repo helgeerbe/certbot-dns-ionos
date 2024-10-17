@@ -2,7 +2,7 @@
 IONOS DNS Authenticator plugin for Certbot
 ![Ionos](https://www.ionos.co.uk/newsroom/wp-content/uploads/sites/7/2021/12/LOGO_IONOS_Blue_RGB-1.png)
 This plugin automates the process of completing a ``dns-01`` challenge by
-creating, and subsequently removing, TXT records using the IONOS Remote API.
+creating, and subsequently removing, TXT records using the [IONOS Remote API](https://developer.hosting.ionos.com/docs/dns).
 ## Configuration of IONOS
 In the `System -> Remote Users` you have to have a user, with the following rights
 - Client Functions
@@ -13,6 +13,7 @@ In the `System -> Remote Users` you have to have a user, with the following righ
 ## Installation
 ### Snap
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/certbot-dns-ionos)
+Snap version is compatible with certbot 3.0.
 ### Pip
 `pip install certbot-dns-ionos`
 ## Named Arguments
@@ -42,7 +43,8 @@ credentials to issue arbitrary API calls on your behalf. Users who can cause
 Certbot to run using these credentials can complete a ``dns-01`` challenge to
 acquire new certificates or revoke existing certificates for associated
 domains, even if those domains aren't being managed by this server.
-> 
+
+> [!WARNING]
 > Certbot will emit a warning if it detects that the credentials file can be
 accessed by other users on your system. The warning reads "Unsafe permissions
 on credentials configuration file", followed by the path to the credentials
@@ -98,6 +100,8 @@ chmod 700 /etc/letsencrypt/.secrets
 ```
 The file 'domain.tld.ini' must be replaced with the version of the example 'credentials.ini' adapted to your provider. 
 ## Changelog
+* 2024.10.17
+  * Update for Certbot 3.0
 * 2024.10.15
   * Update README.md, changed from README.rst
   * Addition of a snap

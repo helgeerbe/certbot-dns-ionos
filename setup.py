@@ -1,11 +1,11 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = '20241015'
+version = '20241017'
 
 install_requires = [
     "acme>=1.8.0",
-    "certbot>=2.0.0",
+    "certbot>=3.0.0",
     "setuptools",
     "requests",
     "mock",
@@ -29,7 +29,7 @@ setup(
     author="Helge Erbe",
     author_email="helge@erbehome.de",
     license="Apache License 2.0",
-    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+    python_requires=">=3.12",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Plugins",
@@ -37,13 +37,7 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Security",
         "Topic :: System :: Installation/Setup",

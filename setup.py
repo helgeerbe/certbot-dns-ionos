@@ -1,11 +1,11 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = "2024.01.08"
+version = '2024.10.19'
 
 install_requires = [
     "acme>=1.8.0",
-    "certbot>=2.0.0",
+    "certbot>=2.11.0",
     "setuptools",
     "requests",
     "mock",
@@ -16,7 +16,7 @@ install_requires = [
 from os import path
 
 this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, "README.rst")) as f:
+with open(path.join(this_directory, "README.md")) as f:
     long_description = f.read()
 
 setup(
@@ -29,7 +29,7 @@ setup(
     author="Helge Erbe",
     author_email="helge@erbehome.de",
     license="Apache License 2.0",
-    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Plugins",
@@ -37,13 +37,12 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Security",
         "Topic :: System :: Installation/Setup",

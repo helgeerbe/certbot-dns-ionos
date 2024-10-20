@@ -128,6 +128,9 @@ The file 'domain.tld.ini' must be replaced with the version of the example 'cred
 
 ## Changelog
 
+- 2024.10.20
+  - fix: set long_description_content_type to text/markdown.
+    This error breaks the upload to pypi
 - 2024.10.19
   - Update for Certbot 2.11.0
   - Update README.md, changed from README.rst

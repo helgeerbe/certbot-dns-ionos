@@ -24,7 +24,7 @@ setup(
     version=version,
     description="IONOS DNS Authenticator plugin for Certbot",
     long_description=long_description,
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     url="https://github.com/helgeerbe/certbot-dns-ionos",
     author="Helge Erbe",
     author_email="helge@erbehome.de",

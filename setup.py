@@ -1,11 +1,11 @@
 from setuptools import setup
 from setuptools import find_packages
 
-version = '2024.10.20'
+version = '2024.11.09'
 
 install_requires = [
-    "acme>=1.8.0",
-    "certbot>=2.11.0",
+    "acme>=3.0.0",
+    "certbot>=3.0.0",
     "setuptools",
     "requests",
     "mock",
